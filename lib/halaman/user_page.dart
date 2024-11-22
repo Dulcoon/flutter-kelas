@@ -11,7 +11,9 @@ class UserPage extends StatefulWidget {
 
 class _UserPageState extends State<UserPage> {
   List<UserModel> listUser = <UserModel>[];
-  final UserService _userService = UserService(); // Tambahkan instansiasi
+  final UserService _userService = UserService();
+
+  int? selectedIndex; // Untuk menyimpan indeks item yang sedang diklik
 
   @override
   void initState() {
@@ -21,8 +23,7 @@ class _UserPageState extends State<UserPage> {
 
   void getDataUser() async {
     try {
-      List<UserModel> listUserTemp =
-          await _userService.fetchUser(); // Akses lewat instance
+      List<UserModel> listUserTemp = await _userService.fetchUser();
       if (listUserTemp.isNotEmpty) {
         setState(() {
           listUser = listUserTemp;
@@ -89,7 +90,7 @@ class _UserPageState extends State<UserPage> {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.pop(context); // Menutup dialog
+                    Navigator.pop(context);
                   },
                   child: const Text('Close'),
                 ),
@@ -120,28 +121,40 @@ class _UserPageState extends State<UserPage> {
           physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.symmetric(vertical: 16.0),
           itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () => showUserDetails(listUser[index]),
-              child: ListTile(
-                leading: ClipOval(
-                  child: Image.network(
-                    listUser[index].avatar ?? '',
-                    width: 52.0,
-                    height: 52.0,
-                    fit: BoxFit.cover,
+            final isSelected =
+                selectedIndex == index; // Apakah item sedang diklik
+            return InkWell(
+              onTap: () {
+                setState(() {
+                  selectedIndex = index; // Tandai item yang diklik
+                });
+                showUserDetails(listUser[index]);
+              },
+              splashColor: Colors.blue.shade100, // Warna animasi ripple
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                color: isSelected ? Colors.blue.shade50 : Colors.transparent,
+                child: ListTile(
+                  leading: ClipOval(
+                    child: Image.network(
+                      listUser[index].avatar ?? '',
+                      width: 52.0,
+                      height: 52.0,
+                      fit: BoxFit.cover,
+                    ),
                   ),
-                ),
-                title: Text(
-                  '${listUser[index].firstName ?? '-'} ${listUser[index].lastName ?? '-'}',
-                  style: const TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.w600,
+                  title: Text(
+                    '${listUser[index].firstName ?? '-'} ${listUser[index].lastName ?? '-'}',
+                    style: const TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-                subtitle: Text(
-                  listUser[index].email ?? '-',
-                  style: const TextStyle(
-                    fontSize: 12.0,
+                  subtitle: Text(
+                    listUser[index].email ?? '-',
+                    style: const TextStyle(
+                      fontSize: 12.0,
+                    ),
                   ),
                 ),
               ),
