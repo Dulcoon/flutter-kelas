@@ -33,6 +33,74 @@ class _UserPageState extends State<UserPage> {
     }
   }
 
+  void showUserDetails(UserModel user) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.blue.shade300, Colors.purple.shade200],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16.0),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ClipOval(
+                  child: Image.network(
+                    user.avatar ?? '',
+                    width: 80.0,
+                    height: 80.0,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                const SizedBox(height: 16.0),
+                Text(
+                  '${user.firstName ?? '-'} ${user.lastName ?? '-'}',
+                  style: const TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 8.0),
+                Text(
+                  user.email ?? '-',
+                  style: const TextStyle(
+                    fontSize: 14.0,
+                    color: Colors.white70,
+                  ),
+                ),
+                const SizedBox(height: 16.0),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.blue.shade600,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context); // Menutup dialog
+                  },
+                  child: const Text('Close'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,29 +119,34 @@ class _UserPageState extends State<UserPage> {
           shrinkWrap: true,
           physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.symmetric(vertical: 16.0),
-          itemBuilder: (context, index) => ListTile(
-            leading: ClipOval(
-              child: Image.network(
-                listUser[index].avatar ?? '',
-                width: 52.0,
-                height: 52.0,
-                fit: BoxFit.cover,
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              onTap: () => showUserDetails(listUser[index]),
+              child: ListTile(
+                leading: ClipOval(
+                  child: Image.network(
+                    listUser[index].avatar ?? '',
+                    width: 52.0,
+                    height: 52.0,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                title: Text(
+                  '${listUser[index].firstName ?? '-'} ${listUser[index].lastName ?? '-'}',
+                  style: const TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                subtitle: Text(
+                  listUser[index].email ?? '-',
+                  style: const TextStyle(
+                    fontSize: 12.0,
+                  ),
+                ),
               ),
-            ),
-            title: Text(
-              '${listUser[index].firstName ?? '-'} ${listUser[index].lastName ?? '-'}',
-              style: const TextStyle(
-                fontSize: 16.0,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            subtitle: Text(
-              listUser[index].email ?? '-',
-              style: const TextStyle(
-                fontSize: 12.0,
-              ),
-            ),
-          ),
+            );
+          },
           separatorBuilder: (context, index) => const Divider(height: 0.8),
         ),
       ),
